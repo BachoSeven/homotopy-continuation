@@ -9,7 +9,7 @@
 
 - Projective coordinates
 - Parallelization
-- Endgames(?)
+- Extract functions in separate modules(?)
 
 ## Example system
 
@@ -20,6 +20,6 @@ xy - 1 &= 0 \\
 \end{align*}
 $$
 
-Plot of our approximate solutions:
+Plot of the approximate solutions:
 
 ![](solutions.png)

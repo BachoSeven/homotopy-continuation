@@ -86,8 +86,8 @@ end
 
 function plot_real(solutions, F)
   p=plot(xlim = (-3, 3), ylim = (-3, 3), aspect_ratio = :equal)
-  contour!(-3:0.1:3, -3:0.1:3, (x,y)->F[1](variables(F)=>[x,y]), levels=[0], color=:cyan)
-  contour!(-3:0.1:3, -3:0.1:3, (x,y)->F[2](variables(F)=>[x,y]), levels=[0], color=:green)
+  contour!(-3:0.1:3, -3:0.1:3, (x,y)->F[1](variables(F)=>[x,y]), levels=[0], cbar=false, color=:cyan)
+  contour!(-3:0.1:3, -3:0.1:3, (x,y)->F[2](variables(F)=>[x,y]), levels=[0], cbar=false, color=:green)
   scatter!([real(sol[1]) for sol in solutions], [real(sol[2]) for sol in solutions], color = "red", label = "Solutions")
 
   png("solutions")
