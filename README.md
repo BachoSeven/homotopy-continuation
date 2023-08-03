@@ -1,9 +1,12 @@
 # Homotopy Continuation in Julia
 
+This is a project for the "Laboratorio Computazionale" exam at the University of Pisa
+
 ## Implemented
 
-- Total-degree Homotopy
-- Roots of unity start system
+- Total-degree Homotopy with "Roots of unity" start system
+- Euler-Newton predictor-corrector method with adaptive step size
+- Homotopy Continuation for all roots of the target system
 
 ## TODO
 
