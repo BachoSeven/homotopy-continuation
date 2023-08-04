@@ -14,7 +14,9 @@ This is a project for the "Laboratorio Computazionale" exam at the University of
 - Parallelization
 - Extract functions in separate modules(?)
 
-## Example system
+## Example systems
+
+Here's some tests on 2x2 systems, with the plotted real approximate solutions
 
 $$
 \begin{align*}
@@ -23,6 +25,26 @@ xy - 1 &= 0 \\
 \end{align*}
 $$
 
-Plot of the approximate solutions:
+![](solutions1.png)
 
-![](solutions.png)
+---
+
+$$
+\begin{align*}
+x^2 + y^2 - 2 &= 0 \\
+xy - 1 &= 0 \\
+\end{align*}
+$$
+
+![](solutions2.png)
+
+---
+
+$$
+\begin{align*}
+x^3 + 5x^2 - y - 10 &= 0 \\
+2x^2 - y - 10 &= 0 \\
+\end{align*}
+$$
+
+![](solutions3.png)
