@@ -51,7 +51,7 @@ sT = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, solve(T))
 sC = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, solve(C))
 
 # Plotting the system and the real solutions
-# ENV["GKSwstype"]="nul"                  
+ENV["GKSwstype"]="nul"
 plot_real(sF, F, 4, 4, "1")
 plot_real(sT, T, 4, 4, "2")
 plot_real(sC, C, 6, 12, "3")

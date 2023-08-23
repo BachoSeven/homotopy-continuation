@@ -24,7 +24,9 @@ xy - 1 &= 0 \\
 \end{align*}
 $$
 
-![](solutions1.png)
+| Single-threaded   | Multi-threaded (nproc=8)        |
+|-------------------|---------------------------------|
+| ![Solution 1](plots/solutions1.png) | ![Multi-threaded Solution 1](plots/solutions1_8threads.png) |
 
 ---
 
@@ -35,7 +37,9 @@ xy - 1 &= 0 \\
 \end{align*}
 $$
 
-![](solutions2.png)
+| Single-threaded   | Multi-threaded (nproc=8)        |
+|-------------------|---------------------------------|
+| ![Solution 2](plots/solutions2.png) | ![Multi-threaded Solution 2](plots/solutions2_8threads.png) |
 
 ---
 
@@ -46,4 +50,6 @@ x^3 + 5x^2 - y - 10 &= 0 \\
 \end{align*}
 $$
 
-![](solutions3.png)
+| Single-threaded   | Multi-threaded (nproc=8)        |
+|-------------------|---------------------------------|
+| ![Solution 3](plots/solutions3.png) | ![Multi-threaded Solution 3](plots/solutions3_8threads.png) |
