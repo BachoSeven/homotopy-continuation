@@ -10,9 +10,8 @@ This is a project for the "Laboratorio Computazionale" exam at the University of
 
 ## TODO
 
-- Projective coordinates
 - Parallelization
-- Extract functions in separate modules(?)
+- Projective coordinates (maybe)
 
 ## Example systems
 
