@@ -20,7 +20,7 @@ function solve(F, (G, roots) = start_system(F), maxsteps=10000)
   #  F=homogenize(F)
   H=homotopy(F,G)
   solutions = []
-  steps = 0
+  step_array = []
 
   @time Threads.@threads for r in roots
     t = 1.0
@@ -37,9 +37,10 @@ function solve(F, (G, roots) = start_system(F), maxsteps=10000)
       steps += 1
     end
     push!(solutions, x0)
+    push!(step_array, steps)
   end
 
-  return (solutions, steps)
+  return (solutions, step_array)
 end
 
 # Input polynomial system
