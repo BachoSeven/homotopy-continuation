@@ -20,7 +20,6 @@ function solve(F, (G, roots) = start_system(F), maxsteps=10000)
   #  F=homogenize(F)
   H=homotopy(F,G)
   solutions = []
-  step_array = []
 
   @time Threads.@threads for r in roots
     t = 1.0
@@ -37,10 +36,9 @@ function solve(F, (G, roots) = start_system(F), maxsteps=10000)
       steps += 1
     end
     push!(solutions, x0)
-    push!(step_array, steps)
   end
 
-  return (solutions, step_array)
+  return solutions
 end
 
 # Input polynomial system
@@ -49,17 +47,9 @@ F = [x*y - 1, x^2 + y^2 - 4]
 T = [x*y - 1, x^2 + y^2 - 2]
 C = [x^3 - y + 5x^2 - 10, 2x^2 - y - 10]
 
-(sF, sf) = solve(F)
-(sT, st) = solve(T)
-(sC, sc) = solve(C)
-
-println(sf)
-println(st)
-println(sc)
-
-sF = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sF)
-sT = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sT)
-sC = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sC)
+sF = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, solve(F))
+sT = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, solve(T))
+sC = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, solve(C))
 
 # Plotting the system and the real solutions
 ENV["GKSwstype"]="nul"
