@@ -2,18 +2,18 @@
 using TypedPolynomials
 
 # Local dependencies
+include("start-system.jl")
 include("homotopy.jl")
-include("plot.jl")
+include("homogenize.jl")
 include("euler-newton.jl")
 include("adapt-step.jl")
-include("start-system.jl")
-include("homogenize.jl")
+include("plot.jl")
+using .StartSystem
 using .Homotopy
-using .Plot
+using .Homogenize
 using .EulerNewton
 using .AdaptStep
-using .StartSystem
-using .Homogenize
+using .Plot
 
 # Main homotopy continuation loop
 function solve(F, (G, roots) = start_system(F), maxsteps=10000)
@@ -21,7 +21,7 @@ function solve(F, (G, roots) = start_system(F), maxsteps=10000)
   H=homotopy(F,G)
   solutions = []
 
-  @time Threads.@threads for r in roots
+  Threads.@threads for r in roots
     t = 1.0
     step_size = 0.01
     x0 = r

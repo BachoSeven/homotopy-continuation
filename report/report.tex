@@ -1,0 +1,153 @@
+\documentclass[a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{tikz-cd}
+
+% for including julia code
+\usepackage{jlcode}
+
+% Remove indentation globally
+\setlength{\parindent}{0pt}
+% Have blank lines between paragraphs
+\usepackage[parfill]{parskip}
+
+\hypersetup{
+    colorlinks = true, % links instead of boxes
+    urlcolor   = cyan, % external hyperlinks
+    linkcolor  = blue, % internal links
+    citecolor  = cyan   % citations
+}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\Z}{\mathbb{Z}}
+
+% use bullets for items
+\renewcommand{\labelitemii}{$\circ$}
+\renewcommand{\Im}{\operatorname{Im}}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{definition}
+\newtheorem{example}{Example}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Esercizio}[section]
+\newtheorem*{exercise*}{Esercizio}
+
+\begin{document}
+\begin{titlepage}
+    \begin{sffamily}
+        \begin{large}
+            \begin{center}
+                \vbox to 100pt{%
+                    \includegraphics[width=3cm]{cherubino}%
+                \vfil}
+            \end{center}
+            \begin{center}
+                \begin{Large}
+                    \uppercase{Universit\`a degli studi di Pisa}
+                \end{Large}\\
+                \rule{9cm}{.4pt}\\
+                \smallskip
+                Dipartimento di Matematica\\
+                \medskip
+                Corso di Laurea Triennale in
+                Matematica\\
+                \bigskip\vfill
+                \begin{Large}
+                    Laboratorio Computazionale
+                \end{Large}\\
+                \bigskip\bigskip\vfil
+                \begin{Huge}
+                    Parallel Homotopy Continuation in Julia
+                \end{Huge}
+                \bigskip\vfill
+                \begin{tabular}{ll}
+                    \textbf{Studente:} & Francesco Minnocci\\
+                    \textbf{Matricola:} & 600455
+                \end{tabular}
+            \end{center}
+            \begin{center}
+                \vfill
+                \rule{9cm}{.4pt}\\
+                \medskip
+                \uppercase{Anno Accademico 2022 - 2023}\\
+            \end{center}
+        \end{large}
+    \end{sffamily}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Homotopy Continuation is a numerical method for solving systems of polynomial equations.
+It is based on the idea of ”deforming” a given system of equations into a simpler one, whose
+solutions are known, and then tracking the solutions of the original system as the deformation
+is undone.
+
+In this project, the method will be implemented in the Julia programming language, making use
+of parallel computing in order to speed multiple root finding. The method is described in detail
+in \cite{BertiniBook}, which was the primary source for this report.
+
+\section{Homotopy Continuation}
+We will only consider \textit{square} systems of polynomial equations, i.e. systems of $n$ polynomial equations in $n$ variables, although or over- or under-determined systems can
+often be solved by reducing them to square systems, by respectively choosing a suitable square subsystem or adding equations.
+
+There are many ways to choose the "simpler" system, from now on called a \textit{start system}, but in general we can observe that, by Bezout's theorem, a system
+$F=(f_1,\ldots,f_n)$ has at most $D:=d_1\ldots d_n$ solutions, where $d_i$ is the degre of $f_i(x_1,\ldots,x_n)$. So, we can use as a start system $G=(g_1,\ldots g_n)$, where
+$$ g_i(x_1,\ldots x_n)=x_i^{d_i}-1 .$$
+Indeed, this system has exactly $D$ solutions
+$$ \left\{(z_1,\ldots,z_n),~z_i=e^{\frac{2\pi i k}{d_i}}\text{ for }k=0,\ldots,d_i\text{ and }i=1,\ldots,n\right\} .$$
+\subsection{Choosing the homotopy}
+The deformation between the original system and the start system is a \textit{homotopy}, for instance one of the form
+\begin{equation}\label{eq:h1} H(x;t)=(1-t)F(x)+tG(x) ,\end{equation}
+where $x:=(x_1,\ldots,x_n).$ This is such that the roots of $H(x;0)=G(x)$ are known, and the roots of $H(x;1)=F(x)$ are the solutions of the original system.
+\subsubsection{Gamma trick}
+While \eqref{eq:h1} is a fine choice of a homotopy, it's not what it's called a \textit{good homotopy}: in order to ensure that the solution paths
+\begin{itemize}
+    \item never cross each other for $t>0$ (at $t=0$ $F$ could have singular solutions), and
+    \item don't go to infinity for $t\to 0$ ($F$ could have a solution at infinity),
+\end{itemize}
+we can employ the \textit{Gamma trick}:
+\subsection{Tracking down the roots}
+\subsubsection{Davidenko differential equation}
+\subsubsection{Predictor: Euler's method}
+\subsubsection{Corrector: Newton's method}
+
+\section{Parallelization}
+
+\section{Implementation}
+\subsection{Julia code}
+\jlinputlisting[caption={solve.jl}]{../solve.jl}
+\jlinputlisting[caption={start-system.jl}]{../start-system.jl}
+\jlinputlisting[caption={homotopy.jl}]{../homotopy.jl}
+\jlinputlisting[caption={homogenize.jl}]{../homogenize.jl}
+\jlinputlisting[caption={euler-newton.jl}]{../euler-newton.jl}
+\jlinputlisting[caption={adapt-step.jl}]{../adapt-step.jl}
+\jlinputlisting[caption={plot.jl}]{../plot.jl}
+\subsection{Hardware}
+
+\section{Results}
+
+\thebibliography{2}
+\bibitem{BertiniBook} Bates, Daniel J. \textit{Numerically solving polynomial systems with Bertini}. SIAM, Society for Industrial Applied Mathematics, 2013.
+\end{document}
