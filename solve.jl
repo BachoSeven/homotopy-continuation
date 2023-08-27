@@ -21,7 +21,7 @@ function solve(F, (G, roots) = start_system(F), maxsteps=10000)
   H=homotopy(F,G)
   solutions = []
 
-  Threads.@threads for r in roots
+  @time Threads.@threads for r in roots
     t = 1.0
     step_size = 0.01
     x0 = r

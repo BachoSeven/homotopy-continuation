@@ -110,28 +110,86 @@ in \cite{BertiniBook}, which was the primary source for this report.
 
 \section{Homotopy Continuation}
 We will only consider \textit{square} systems of polynomial equations, i.e. systems of $n$ polynomial equations in $n$ variables, although or over- or under-determined systems can
-often be solved by reducing them to square systems, by respectively choosing a suitable square subsystem or adding equations.
+often be solved by reducing them to square systems, by respectively choosing a suitable square subsystem or adding equations. Morever, we will restrict ourselves to systems with
+isolated solutions, i.e. zero-dimensional varieties.
 
 There are many ways to choose the "simpler" system, from now on called a \textit{start system}, but in general we can observe that, by Bezout's theorem, a system
-$F=(f_1,\ldots,f_n)$ has at most $D:=d_1\ldots d_n$ solutions, where $d_i$ is the degre of $f_i(x_1,\ldots,x_n)$. So, we can use as a start system $G=(g_1,\ldots g_n)$, where
-$$ g_i(x_1,\ldots x_n)=x_i^{d_i}-1 .$$
-Indeed, this system has exactly $D$ solutions
-$$ \left\{(z_1,\ldots,z_n),~z_i=e^{\frac{2\pi i k}{d_i}}\text{ for }k=0,\ldots,d_i\text{ and }i=1,\ldots,n\right\} .$$
+$F=(f_1,\ldots,f_n)$ has at most $D:=d_1\ldots d_n$ solutions, where $d_i$ is the degre of $f_i(x_1,\ldots,x_n)$. So, we could build a start system of the same size and whose
+polynomials have the same degrees, but whose solutions are easy to find, and thus can be used as starting points for the method.
+
+For instance, the system $G=(g_1,\ldots g_n)$, where
+$$ g_i(x_1,\ldots x_n)=x_i^{d_i}-1 ,$$
+is such a system, since it has exactly the $D$ solutions
+$$ \left\{\left(e^{\frac{k_1}{d_1}2\pi i},\ldots,e^{\frac{k_n}{d_n}2\pi i}\right),\text{ for }0\leq k_i\leq d_i-1\,\text{ and }i=1,\ldots,n\right\} .$$
 \subsection{Choosing the homotopy}
-The deformation between the original system and the start system is a \textit{homotopy}, for instance one of the form
-\begin{equation}\label{eq:h1} H(x;t)=(1-t)F(x)+tG(x) ,\end{equation}
-where $x:=(x_1,\ldots,x_n).$ This is such that the roots of $H(x;0)=G(x)$ are known, and the roots of $H(x;1)=F(x)$ are the solutions of the original system.
+The deformation between the original system and the start system is a \textit{homotopy}, for instance the convex combination of $F$ and $G$
+\begin{equation}\label{eq:h1} H(x,t)=(1-t)F(x)+tG(x) ,\end{equation}
+where $x:=(x_1,\ldots,x_n)$ and $t\in[0,1].$ This is such that the roots of $H(x,0)=G(x)$ are known, and the roots of $H(x,1)=F(x)$ are the solutions of the original system. Therefore, we can implicitly
+define a curve $z(t)$ in $\C^n$ by the equation \begin{equation}\label{eq:h2} H(z(t),t)=0,\end{equation} so that in order to approximate the roots of $F$ it is enough to numerically track $z(t)$.
+
+To do so, we derive the expression \eqref{eq:h2} with respect to $t$, and get the \textit{Davidenko Differential Equation}
+$$ \frac{\partial H}{\partial z}\frac{\mathrm{d} z}{\mathrm{d} t}+\frac{\partial H}{\partial t}=0 ,$$
+where $\frac{\partial H}{\partial z}$ is the Jacobian matrix of $H$ with respect to $z$:
+$$
+\frac{\partial H}{\partial z}=
+\begin{pmatrix}
+    \frac{\partial H_1}{\partial z_1} & \cdots & \frac{\partial H_1}{\partial z_n}\\
+    \vdots & \ddots & \vdots\\
+    \frac{\partial H_n}{\partial z_1} & \cdots & \frac{\partial H_n}{\partial z_n}
+\end{pmatrix} .
+$$
+This can be rewritten as
+\begin{equation}\label{eq:dav} \dot{z}=-\frac{\partial H}{\partial z}^{-1}\frac{\partial H}{\partial t} .\end{equation}
+This is a system of $n$ first-order differential equations, which can be solved numerically for $z(t)$ as an initial value problem, and is called \textit{path tracking}.
 \subsubsection{Gamma trick}
-While \eqref{eq:h1} is a fine choice of a homotopy, it's not what it's called a \textit{good homotopy}: in order to ensure that the solution paths
+While \eqref{eq:h1} is a fine choice of a homotopy, it's not what it's called a \textit{good homotopy}: in order to ensure that the solution paths $z(t)$ for different roots
 \begin{itemize}
-    \item never cross each other for $t>0$ (at $t=0$ $F$ could have singular solutions), and
+    \item have no singularities, i.e. never cross each other for $t>0$ (at $t=0$, $F$ could have singular solutions), and
     \item don't go to infinity for $t\to 0$ ($F$ could have a solution at infinity),
 \end{itemize}
-we can employ the \textit{Gamma trick}:
+we can employ the \textit{Gamma trick}: this consists in modifying the linear homotopy
+\eqref{eq:h1} by susbtituting the parameter $t\in[0,1]$ with a complex curve $q(t)$ connecting $0$ and $1$:
+$$ q(t)=\frac{\gamma t}{\gamma t+(1-t)} ,$$
+where $\gamma\in(0,1)$ is a random complex parameter.This "probability one" procedure, i.e. for any particular system choosing $\gamma$ outside of a finite amount of lines through
+the origin ensures that we get a good homotopy, basically because of the finiteness of the branch locus of the homotopy.
+After substituting, we get
+$$ H(x,t)=\frac{(1-t)}{\gamma t+(1-t)}F(x)+\frac{\gamma t}{\gamma t+(1-t)}G(x) ,$$
+and clearing denominators, here's our final homotopy:
+\begin{equation}\label{eq:h3} H(x,t)=(1-t)F(x)+\gamma tG(x) .\end{equation}
 \subsection{Tracking down the roots}
-\subsubsection{Davidenko differential equation}
+We now want to track down individual roots, following the solution paths from
+a root $z_0$ of the start system by solving the initial value problem associated to the Davidenko differential equation \eqref{eq:dav} with starting value $z_0$ and
+$t$ ranging from $1$ to $0$.
+
+This will be done numerically, using a first-order predictor-corrector tracking method, which consists in first using Euler's method to get an approximation
+$\widetilde{z}_i$, and then using Newton's method to correct it
+using equation \eqref{eq:h2} so that it becomes a good approximation $z_i$ of the next value of the solution path.
 \subsubsection{Predictor: Euler's method}
+Recall that Euler's method consists in approximating the solution of the initial value problem associated to a first-order ordinary differential equations
+% Braced system of equations below
+\begin{equation*}
+    \left\{
+        \begin{aligned}
+            &\dot{z}=f(z,t)\\
+            &z(t_0)=z_0
+        \end{aligned}
+    \right.
+\end{equation*}
+by the sequence of points $(z_i)_{i\in\N}$ defined by the recurrence relation
+$$ z_{i+1}=z_i+h\cdot f(z_i,t_i) ,$$
+where $h$ is the step size.
+In our case, we have $$f(z,t)=-\left(\frac{\partial H}{\partial z}(z,t)\right)^{-1}\frac{\partial H}{\partial t}(z,t)$$ and $t_0=1$, since we track from $1$ to $0$. For the same
+reason, we set $$t_i=t_{i-1}-h.$$ We will also use a variable step size, based on the output of each iteration.
 \subsubsection{Corrector: Newton's method}
+Since we want to solve $$H(z,t)=0,$$ we can use Newton's method to improve the approximation $\widetilde{z_i}$ obtained by Euler's method to a solution of such equation.
+This is done by moving towards the root of the tangent line of $H$ at the current approximation, or in other words through the iteration
+$$ z_{i+1}=z_i-\left(\frac{\partial H}{\partial z}(z_i,t_i)\right)^{-1}H(z_i,t_i) ,$$
+where this time $z_0=\widetilde{z}_i$ and $t_0=t_i$ as obtained in the Euler step.
+
+Usually, only a few steps of Newton's method are needed; we will use a fixed maximum of $10$ steps,
+stopping the iterations when the desired accuracy is reached, for instance when the norm of $H(z_i,t_i)$ is less than $10^{-8}$.
+At this point, we use the final value of the Newton iteration as the starting value for the next Euler step.
+\subsubsection{Adaptive step size}
 
 \section{Parallelization}
 
