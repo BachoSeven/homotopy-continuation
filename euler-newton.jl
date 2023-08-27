@@ -16,14 +16,11 @@ module EulerNewton
     xh = x + Δx * step_size
 
     # Corrector step
-    JHh=differentiate(H(t+step_size), vars)
-    for _ in 1:10
+    JHh=differentiate(H(t-step_size), vars)
+    for _ in 1:5
       JH = [jh(vars=>xh) for jh in JHh]
-      Δx = JH \ -[h(vars=>xh) for h in H(t+step_size)]
+      Δx = JH \ -[h(vars=>xh) for h in H(t-step_size)]
       xh = xh + Δx
-      if LinearAlgebra.norm([h(vars=>xh) for h in H(t+step_size)]) < 1e-8
-        break
-      end
     end
 
     return xh

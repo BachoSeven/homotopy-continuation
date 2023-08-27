@@ -179,19 +179,23 @@ by the sequence of points $(z_i)_{i\in\N}$ defined by the recurrence relation
 $$ z_{i+1}=z_i+h\cdot f(z_i,t_i) ,$$
 where $h$ is the step size.
 In our case, we have $$f(z,t)=-\left(\frac{\partial H}{\partial z}(z,t)\right)^{-1}\frac{\partial H}{\partial t}(z,t)$$ and $t_0=1$, since we track from $1$ to $0$. For the same
-reason, we set $$t_i=t_{i-1}-h.$$ We will also use a variable step size, based on the output of each iteration.
+reason, we set $$t_{i+1}=t_i-h.$$
 \subsubsection{Corrector: Newton's method}
 Since we want to solve $$H(z,t)=0,$$ we can use Newton's method to improve the approximation $\widetilde{z_i}$ obtained by Euler's method to a solution of such equation.
 This is done by moving towards the root of the tangent line of $H$ at the current approximation, or in other words through the iteration
-$$ z_{i+1}=z_i-\left(\frac{\partial H}{\partial z}(z_i,t_i)\right)^{-1}H(z_i,t_i) ,$$
-where this time $z_0=\widetilde{z}_i$ and $t_0=t_i$ as obtained in the Euler step.
+$$ z_{i+1}=z_i-\left(\frac{\partial H}{\partial z}(z_i,t_{i+1})\right)^{-1}H(z_i,t_{i+1}) ,$$
+where this time $z_0=\widetilde{z}_i$, with $\widetilde{z}_i$ and $t_{i+1}$ obtained from the $i$-th Euler step.
 
-Usually, only a few steps of Newton's method are needed; we will use a fixed maximum of $10$ steps,
-stopping the iterations when the desired accuracy is reached, for instance when the norm of $H(z_i,t_i)$ is less than $10^{-8}$.
+Usually, only a few steps of Newton's method are needed; we will use a fixed number of 5 iterations.
 At this point, we use the final value of the Newton iteration as the starting value for the next Euler step.
 \subsubsection{Adaptive step size}
+In order to improve the efficiency of the algorithm, we will use an adaptive step size, which will be based on the norm of the residual of the Newton iteration.
+If the desired accuracy is not reached, for instance when the norm of $H(z_i,t_i)$ is bigger than $10^{-8}$,
+then we halve the step size; if instead we have 5 "successful" iterations in a row, we double the step size.
 
 \section{Parallelization}
+\subsection{Multithreading}
+\subsection{MPI}
 
 \section{Implementation}
 \subsection{Julia code}

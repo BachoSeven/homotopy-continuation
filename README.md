@@ -11,11 +11,35 @@ This is a project for the "Laboratorio Computazionale" exam at the University of
 ## TODO
 
 - Parallelization
-- Projective coordinates (maybe)
+- Homogenization
 
 ## Example systems
 
 Here's some tests on 2x2 systems, with the plotted real approximate solutions
+
+$$
+\begin{align*}
+x^3 + 5x^2 - y - 10 &= 0 \\
+2x^2 - y - 10 &= 0 \\
+\end{align*}
+$$
+
+| Single-threaded   | Multi-threaded (nproc=8)        |
+|-------------------|---------------------------------|
+| ![Solution 1](plots/solutions1.png) | ![Multi-threaded Solution 1](plots/solutions1_8threads.png) |
+
+---
+
+$$
+\begin{align*}
+x^2 + 2y  &= 0 \\
+y - 3x^3 &= 0 \\
+\end{align*}
+$$
+
+| Single-threaded   | Multi-threaded (nproc=8)        |
+|-------------------|---------------------------------|
+| ![Solution 2](plots/solutions2.png) | ![Multi-threaded Solution 2](plots/solutions2_8threads.png) |
 
 $$
 \begin{align*}
@@ -26,7 +50,7 @@ $$
 
 | Single-threaded   | Multi-threaded (nproc=8)        |
 |-------------------|---------------------------------|
-| ![Solution 1](plots/solutions1.png) | ![Multi-threaded Solution 1](plots/solutions1_8threads.png) |
+| ![Solution 3](plots/solutions3.png) | ![Multi-threaded Solution 3](plots/solutions3_8threads.png) |
 
 ---
 
@@ -39,17 +63,4 @@ $$
 
 | Single-threaded   | Multi-threaded (nproc=8)        |
 |-------------------|---------------------------------|
-| ![Solution 2](plots/solutions2.png) | ![Multi-threaded Solution 2](plots/solutions2_8threads.png) |
-
----
-
-$$
-\begin{align*}
-x^3 + 5x^2 - y - 10 &= 0 \\
-2x^2 - y - 10 &= 0 \\
-\end{align*}
-$$
-
-| Single-threaded   | Multi-threaded (nproc=8)        |
-|-------------------|---------------------------------|
-| ![Solution 3](plots/solutions3.png) | ![Multi-threaded Solution 3](plots/solutions3_8threads.png) |
+| ![Solution 4](plots/solutions4.png) | ![Multi-threaded Solution 4](plots/solutions4_8threads.png) |
