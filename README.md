@@ -24,9 +24,9 @@ x^3 + 5x^2 - y - 10 &= 0 \\
 \end{align*}
 $$
 
-| Single-threaded   | Multi-threaded (nproc=8)        |
+| Single-threaded   | Multi-threaded (nproc=6)        |
 |-------------------|---------------------------------|
-| ![Solution 1](plots/solutions1.png) | ![Multi-threaded Solution 1](plots/solutions1_8threads.png) |
+| ![Solution 1](plots/solutions1.png) | ![Multi-threaded Solution 1](plots/solutions1_6.png) |
 
 ---
 
@@ -37,9 +37,9 @@ y - 3x^3 &= 0 \\
 \end{align*}
 $$
 
-| Single-threaded   | Multi-threaded (nproc=8)        |
+| Single-threaded   | Multi-threaded (nproc=6)        |
 |-------------------|---------------------------------|
-| ![Solution 2](plots/solutions2.png) | ![Multi-threaded Solution 2](plots/solutions2_8threads.png) |
+| ![Solution 2](plots/solutions2.png) | ![Multi-threaded Solution 2](plots/solutions2_6.png) |
 
 $$
 \begin{align*}
@@ -48,9 +48,9 @@ xy - 1 &= 0 \\
 \end{align*}
 $$
 
-| Single-threaded   | Multi-threaded (nproc=8)        |
+| Single-threaded   | Multi-threaded (nproc=6)        |
 |-------------------|---------------------------------|
-| ![Solution 3](plots/solutions3.png) | ![Multi-threaded Solution 3](plots/solutions3_8threads.png) |
+| ![Solution 3](plots/solutions3.png) | ![Multi-threaded Solution 3](plots/solutions3_6.png) |
 
 ---
 
@@ -61,6 +61,6 @@ xy - 1 &= 0 \\
 \end{align*}
 $$
 
-| Single-threaded   | Multi-threaded (nproc=8)        |
+| Single-threaded   | Multi-threaded (nproc=6)        |
 |-------------------|---------------------------------|
-| ![Solution 4](plots/solutions4.png) | ![Multi-threaded Solution 4](plots/solutions4_8threads.png) |
+| ![Solution 4](plots/solutions4.png) | ![Multi-threaded Solution 4](plots/solutions4_6.png) |
