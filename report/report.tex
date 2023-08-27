@@ -7,6 +7,7 @@
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{geometry}
 \usepackage{tikz-cd}
+\usepackage{subcaption}
 
 % for including julia code
 \usepackage{jlcode}
@@ -189,15 +190,22 @@ where this time $z_0=\widetilde{z}_i$, with $\widetilde{z}_i$ and $t_{i+1}$ obta
 Usually, only a few steps of Newton's method are needed; we will use a fixed number of 5 iterations.
 At this point, we use the final value of the Newton iteration as the starting value for the next Euler step.
 \subsubsection{Adaptive step size}
-In order to improve the efficiency of the algorithm, we will use an adaptive step size, which will be based on the norm of the residual of the Newton iteration.
+In order to improve the efficiency of the method, we will use an adaptive step size, which will be based on the norm of the residual of the Newton iteration.
 If the desired accuracy is not reached, for instance when the norm of $H(z_i,t_i)$ is bigger than $10^{-8}$,
 then we halve the step size; if instead we have 5 "successful" iterations in a row, we double the step size.
 
 \section{Parallelization}
 \subsection{Multithreading}
-\subsection{MPI}
+When testing the method, we tried to use multithreading to speed up the computation.
+This was done in Julia by using the \texttt{Threads.@threads} macro, which automatically distributes the work of a \texttt{for} loop among the available threads.
+However, in the case of looping over multiple roots, this didn't improve the performance, as the overhead of the multithreading was too big compared to the actual computation time,
+as the systems were too small to benefit from this kind of parallelization, as can be seen by the results in Appendix \hyperref[sec:mt]{B}.
 
-\section{Implementation}
+\subsection{MPI}
+Next, we tried to use MPI to parallelize the tracking of the roots.
+This was done by using the \texttt{MPI.jl} package, which provides a Julia interface to the MPI library.
+
+\section{Appendix A: Implementation}
 \subsection{Julia code}
 \jlinputlisting[caption={solve.jl}]{../solve.jl}
 \jlinputlisting[caption={start-system.jl}]{../start-system.jl}
@@ -207,8 +215,46 @@ then we halve the step size; if instead we have 5 "successful" iterations in a r
 \jlinputlisting[caption={adapt-step.jl}]{../adapt-step.jl}
 \jlinputlisting[caption={plot.jl}]{../plot.jl}
 \subsection{Hardware}
+\section{Appendix B: Results}
 
-\section{Results}
+\subsection{Multithreading}\label{sec:mt}
+
+Here are the plots for the solutions of four different 2x2 systems, with the single-threaded version next to the multithreaded one:
+
+\newgeometry{left=.1cm,top=0.1cm}
+\begin{figure}[htb]
+    \begin{tabular}{c c c}
+        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions1.png}} &
+        $\left\{\begin{aligned}
+                    &x^3 + 5x^2 - y - 1 \\
+                    &2x^2 - y - 1 \\
+        \end{aligned}\right.$ &
+        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions1_6.png}} \\
+        \vspace{0.5cm} \\
+        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions2.png}} &
+        $\left\{\begin{aligned}
+                    &x^2 + 2y  \\
+                    &y - 3x^3 \\
+        \end{aligned}\right.$ &
+        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions2_6.png}} \\
+        \vspace{0.5cm} \\
+        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions3.png}} &
+        $\left\{\begin{aligned}
+                    &x^2 + y^2 - 4 \\
+                    &xy - 1 \\
+        \end{aligned}\right.$ &
+        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions3_6.png}} \\
+        \vspace{0.5cm} \\
+        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions4.png}} &
+        $\left\{\begin{aligned}
+                    &x^2 + y^2 - 2 \\
+                    &xy - 1 \\
+        \end{aligned}\right.$ &
+        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions4_6.png}} \\
+    \end{tabular}
+\end{figure}
+
+\restoregeometry
 
 \thebibliography{2}
 \bibitem{BertiniBook} Bates, Daniel J. \textit{Numerically solving polynomial systems with Bertini}. SIAM, Society for Industrial Applied Mathematics, 2013.
