@@ -7,10 +7,12 @@
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{geometry}
 \usepackage{tikz-cd}
-\usepackage{subcaption}
 
 % for including julia code
 \usepackage{jlcode}
+
+% for vertically aligning images with text
+\usepackage[export]{adjustbox}
 
 % Remove indentation globally
 \setlength{\parindent}{0pt}
@@ -192,7 +194,7 @@ At this point, we use the final value of the Newton iteration as the starting va
 \subsubsection{Adaptive step size}
 In order to improve the efficiency of the method, we will use an adaptive step size, which will be based on the norm of the residual of the Newton iteration.
 If the desired accuracy is not reached, for instance when the norm of $H(z_i,t_i)$ is bigger than $10^{-8}$,
-then we halve the step size; if instead we have 5 "successful" iterations in a row, we double the step size.
+then we halve the step size; if instead we have 5 "successful" iterations in a row, we double the step size, as implemented in Appendix \hyperref[code:adapt]{A}.
 
 \section{Parallelization}
 \subsection{Multithreading}
@@ -203,7 +205,7 @@ as the systems were too small to benefit from this kind of parallelization, as c
 
 \subsection{MPI}
 Next, we tried to use MPI to parallelize the tracking of the roots.
-This was done by using the \texttt{MPI.jl} package, which provides a Julia interface to the MPI library.
+This was done by using the \texttt{MPI.jl} \cite{JuliaMPI} package, which provides a Julia interface to the MPI library.
 
 \section{Appendix A: Implementation}
 \subsection{Julia code}
@@ -212,7 +214,7 @@ This was done by using the \texttt{MPI.jl} package, which provides a Julia inter
 \jlinputlisting[caption={homotopy.jl}]{../homotopy.jl}
 \jlinputlisting[caption={homogenize.jl}]{../homogenize.jl}
 \jlinputlisting[caption={euler-newton.jl}]{../euler-newton.jl}
-\jlinputlisting[caption={adapt-step.jl}]{../adapt-step.jl}
+\label{code:adapt}\jlinputlisting[caption={adapt-step.jl}]{../adapt-step.jl}
 \jlinputlisting[caption={plot.jl}]{../plot.jl}
 \subsection{Hardware}
 \section{Appendix B: Results}
@@ -224,33 +226,34 @@ Here are the plots for the solutions of four different 2x2 systems, with the sin
 \newgeometry{left=.1cm,top=0.1cm}
 \begin{figure}[htb]
     \begin{tabular}{c c c}
-        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions1.png}} &
+        Single-threaded & & Multithreaded \\
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions1.png} &
         $\left\{\begin{aligned}
                     &x^3 + 5x^2 - y - 1 \\
                     &2x^2 - y - 1 \\
         \end{aligned}\right.$ &
-        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions1_6.png}} \\
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions1_6.png} \\
         \vspace{0.5cm} \\
-        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions2.png}} &
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions2.png} &
         $\left\{\begin{aligned}
                     &x^2 + 2y  \\
                     &y - 3x^3 \\
         \end{aligned}\right.$ &
-        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions2_6.png}} \\
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions2_6.png} \\
         \vspace{0.5cm} \\
-        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions3.png}} &
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions3.png} &
         $\left\{\begin{aligned}
                     &x^2 + y^2 - 4 \\
                     &xy - 1 \\
         \end{aligned}\right.$ &
-        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions3_6.png}} \\
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions3_6.png} \\
         \vspace{0.5cm} \\
-        \subcaptionbox{Single-threaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions4.png}} &
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions4.png} &
         $\left\{\begin{aligned}
                     &x^2 + y^2 - 2 \\
                     &xy - 1 \\
         \end{aligned}\right.$ &
-        \subcaptionbox{Multithreaded}{\includegraphics[width=0.45\textwidth]{../plots/solutions4_6.png}} \\
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions4_6.png} \\
     \end{tabular}
 \end{figure}
 
@@ -258,4 +261,5 @@ Here are the plots for the solutions of four different 2x2 systems, with the sin
 
 \thebibliography{2}
 \bibitem{BertiniBook} Bates, Daniel J. \textit{Numerically solving polynomial systems with Bertini}. SIAM, Society for Industrial Applied Mathematics, 2013.
+\bibitem{JuliaMPI} Simon Byrne, Lucas C. Wilcox, and Valentin Churavy (2021) "MPI.jl: Julia bindings for the Message Passing Interface". JuliaCon Proceedings, 1(1), 68, doi: 10.21105/jcon.00068
 \end{document}
