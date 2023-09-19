@@ -44,40 +44,42 @@ function solve(F, (G, roots) = start_system(F), maxsteps = 1000)
   return (solutions, step_array)
 end
 
-# Input polynomial system
-dimension = 2
-max_degree = 2
-R = random_system(dimension, max_degree)
+# Input polynomial systems
 #  @polyvar x y
 #  C = [x^3 - y + 5x^2 - 10, 2x^2 - y - 10]
 #  Q = [x^2 + 2y, y - 3x^3]
 #  F = [x*y - 1, x^2 + y^2 - 4]
 #  T = [x*y - 1, x^2 + y^2 - 2]
+dimension = 2
+R = random_system(2, 2)
+println(R)
 
-(sR, stepsR) = solve(R)
 #  (sC, stepsC) = solve(C)
 #  (sQ, stepsQ) = solve(Q)
 #  (sF, stepsF) = solve(F)
 #  (sT, stepsT) = solve(T)
-
-println("R: ", stepsR)
-println("solutions:", sR)
-vars = variables(R)
-println([LinearAlgebra.norm([f(vars=>s) for f in R]) for s in sR])
+(sR, stepsR) = solve(R)
 
 #  println("C: ", stepsC)
 #  println("Q: ", stepsQ)
 #  println("F: ", stepsF)
 #  println("T: ", stepsT)
+println("R: ", stepsR)
 
 #  sC = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sC)
 #  sQ = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sQ)
 #  sF = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sF)
 #  sT = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sT)
+sR = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sR)
+
+vars = variables(R)
+println("solutions: ", sR)
+println([LinearAlgebra.norm([f(vars=>s) for f in R]) for s in sR])
 
 # Plotting the system and the real solutions
-#  ENV["GKSwstype"]="nul"
+ENV["GKSwstype"]="nul"
 #  plot_real(sC, C, 6, 12, "1")
 #  plot_real(sQ, Q, 2, 2, "2")
 #  plot_real(sF, F, 4, 4, "3")
 #  plot_real(sT, T, 4, 4, "4")
+plot_real(sR, R, 5, 5, "random")
