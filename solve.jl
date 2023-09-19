@@ -1,5 +1,6 @@
 # External dependencies
 using TypedPolynomials
+using LinearAlgebra
 
 # Local dependencies
 include("random_poly.jl")
@@ -44,8 +45,8 @@ function solve(F, (G, roots) = start_system(F), maxsteps = 1000)
 end
 
 # Input polynomial system
-dimension = 4
-max_degree = 3
+dimension = 2
+max_degree = 2
 R = random_system(dimension, max_degree)
 #  @polyvar x y
 #  C = [x^3 - y + 5x^2 - 10, 2x^2 - y - 10]
@@ -60,7 +61,9 @@ R = random_system(dimension, max_degree)
 #  (sT, stepsT) = solve(T)
 
 println("R: ", stepsR)
-println("solutions:" sR)
+println("solutions:", sR)
+vars = variables(R)
+println([LinearAlgebra.norm([f(vars=>s) for f in R]) for s in sR])
 
 #  println("C: ", stepsC)
 #  println("Q: ", stepsQ)
