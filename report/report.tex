@@ -203,8 +203,8 @@ This was done in Julia by using the \texttt{Threads.@threads} macro, which autom
 However, in the case of looping over multiple roots, this didn't improve the performance, as the overhead of the multithreading was too big compared to the actual computation time,
 as the systems were too small to benefit from this kind of parallelization, as can be seen by the results in Appendix \hyperref[sec:mt]{B}.
 
-\subsection{MPI}
-Next, we tried to use MPI to parallelize the tracking of the roots.
+\subsection{Distributed}
+Next, we tried to use \textit{Distributed.jl} to parallelize the tracking of the roots.
 This was done by using the \texttt{MPI.jl} \cite{JuliaMPI} package, which provides a Julia interface to the MPI library.
 
 \section{Appendix A: Implementation}
@@ -267,5 +267,4 @@ Here are the plots for the solutions of four different 2x2 systems, with the sin
 
 \thebibliography{2}
 \bibitem{BertiniBook} Bates, Daniel J. \textit{Numerically solving polynomial systems with Bertini}. SIAM, Society for Industrial Applied Mathematics, 2013.
-\bibitem{JuliaMPI} Simon Byrne, Lucas C. Wilcox, and Valentin Churavy (2021) "MPI.jl: Julia bindings for the Message Passing Interface". JuliaCon Proceedings, 1(1), 68, doi: 10.21105/jcon.00068
 \end{document}

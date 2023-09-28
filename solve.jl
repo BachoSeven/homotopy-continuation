@@ -1,6 +1,7 @@
 # External dependencies
 using TypedPolynomials
 using LinearAlgebra
+using Distributed
 
 # Local dependencies
 include("random_poly.jl")
@@ -16,15 +17,17 @@ using .EulerNewton
 using .AdaptStep
 using .Plot
 
+# Launch worker processes
+num_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
+addprocs(num_cores)
+
 # Main homotopy continuation loop
 function solve(F, (G, roots) = start_system(F), maxsteps = 1000)
   H=homotopy(F,G)
   solutions = []
   step_array = []
 
-  Threads.@threads for r in roots
-  #  for r in roots
-    println("New root")
+  @distributed for r in roots
     t = 1.0
     step_size = 0.01
     x0 = r
@@ -41,6 +44,9 @@ function solve(F, (G, roots) = start_system(F), maxsteps = 1000)
     push!(step_array, steps)
   end
 
+  # Gather results from worker processes
+  solutions = fetch(solutions)
+  step_array = fetch(step_array)
   return (solutions, step_array)
 end
 
