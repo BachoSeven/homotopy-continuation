@@ -2,6 +2,7 @@
 using TypedPolynomials
 using LinearAlgebra
 using Distributed
+using ClusterManagers
 
 # Local dependencies
 include("random_poly.jl")
@@ -18,36 +19,36 @@ using .AdaptStep
 using .Plot
 
 # Launch worker processes
-num_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
-addprocs(num_cores)
+addprocs(SlurmManager(40), N=20, t="01:00:00"))
+
+function compute_root(H, r, maxsteps)
+  t = 1.0
+  step_size = 0.01
+  x0 = r
+  m = 0
+  steps = 0
+
+  while t > 0 && steps < maxsteps
+    x0 = en_step(H, x0, t, step_size)
+    (m, step_size) = adapt_step(H, x0, t, step_size, m)
+    t -= step_size
+    steps += 1
+  end
+  return (x0, steps)
+end
 
 # Main homotopy continuation loop
-function solve(F, (G, roots) = start_system(F), maxsteps = 1000)
+function solve(F, (G, roots) = start_system(F))
   H=homotopy(F,G)
-  solutions = []
-  step_array = []
 
   @distributed for r in roots
-    t = 1.0
-    step_size = 0.01
-    x0 = r
-    m = 0
-    steps = 0
-
-    while t > 0 && steps < maxsteps
-      x0 = en_step(H, x0, t, step_size)
-      (m, step_size) = adapt_step(H, x0, t, step_size, m)
-      t -= step_size
-      steps += 1
-    end
-    push!(solutions, x0)
-    push!(step_array, steps)
+    (solutions, step_array) = compute_root(H, r, maxsteps = 1000)
   end
 
   # Gather results from worker processes
-  solutions = fetch(solutions)
-  step_array = fetch(step_array)
-  return (solutions, step_array)
+  sols = fetch(solutions)
+  steps = fetch(step_array)
+  return (sols, steps)
 end
 
 # Input polynomial systems
