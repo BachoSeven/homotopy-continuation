@@ -38,11 +38,11 @@ end
 function solve(F, (G, roots)=start_system(F))
   H = homotopy(F, G)
 
-  sols = SharedArray{Complex{Float64}}(length(roots))
+  sols = SharedArray{ComplexF64,2}(length(roots), length(F))
   steps = SharedArray{Int64}(length(roots))
-  @sync @distributed for (i, r) in enumerate(roots)
-    (solutions, step_array) = compute_root(H, r)
-    sols[i] = solutions
+  @sync @distributed for i in eachindex(roots)
+    (solutions, step_array) = compute_root(H, roots[i])
+    sols[i, :] = solutions
     steps[i] = step_array
   end
 
@@ -57,13 +57,15 @@ end
 #  T = [x*y - 1, x^2 + y^2 - 2]
 dimension = 2
 R = random_system(2, 2)
-println(R)
+println("System: ", R)
 
 #  (sC, stepsC) = solve(C)
 #  (sQ, stepsQ) = solve(Q)
 #  (sF, stepsF) = solve(F)
 #  (sT, stepsT) = solve(T)
 (sR, stepsR) = solve(R)
+# converting sR to array of arrays instead of a matrix
+sR = [sR[i, :] for i in 1:length(sR[:, 1])]
 
 #  println("C: ", stepsC)
 #  println("Q: ", stepsQ)
@@ -78,8 +80,8 @@ println("R: ", stepsR)
 sR = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sR)
 
 vars = variables(R)
-println("solutions: ", sR)
-println([LinearAlgebra.norm([f(vars => s) for f in R]) for s in sR])
+println("Solutions: ", sR)
+println("Norms (lower = better): ", [LinearAlgebra.norm([f(vars => s) for f in R]) for s in sR])
 
 # Plotting the system and the real solutions
 ENV["GKSwstype"] = "nul"
