@@ -2,7 +2,7 @@
 using TypedPolynomials
 using LinearAlgebra
 using Distributed
-using ClusterManagers
+using SharedArrays
 
 # Local dependencies
 include("random_poly.jl")
@@ -18,10 +18,7 @@ using .EulerNewton
 using .AdaptStep
 using .Plot
 
-# Launch worker processes
-addprocs(SlurmManager(40), N=20, t="01:00:00"))
-
-function compute_root(H, r, maxsteps)
+function compute_root(H, r, maxsteps=1000)
   t = 1.0
   step_size = 0.01
   x0 = r
@@ -38,16 +35,17 @@ function compute_root(H, r, maxsteps)
 end
 
 # Main homotopy continuation loop
-function solve(F, (G, roots) = start_system(F))
-  H=homotopy(F,G)
+function solve(F, (G, roots)=start_system(F))
+  H = homotopy(F, G)
 
-  @distributed for r in roots
-    (solutions, step_array) = compute_root(H, r, maxsteps = 1000)
+  sols = SharedArray{Complex{Float64}}(length(roots))
+  steps = SharedArray{Int64}(length(roots))
+  @sync @distributed for (i, r) in enumerate(roots)
+    (solutions, step_array) = compute_root(H, r)
+    sols[i] = solutions
+    steps[i] = step_array
   end
 
-  # Gather results from worker processes
-  sols = fetch(solutions)
-  steps = fetch(step_array)
   return (sols, steps)
 end
 
@@ -81,10 +79,10 @@ sR = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sR)
 
 vars = variables(R)
 println("solutions: ", sR)
-println([LinearAlgebra.norm([f(vars=>s) for f in R]) for s in sR])
+println([LinearAlgebra.norm([f(vars => s) for f in R]) for s in sR])
 
 # Plotting the system and the real solutions
-ENV["GKSwstype"]="nul"
+ENV["GKSwstype"] = "nul"
 #  plot_real(sC, C, 6, 12, "1")
 #  plot_real(sQ, Q, 2, 2, "2")
 #  plot_real(sF, F, 4, 4, "3")
