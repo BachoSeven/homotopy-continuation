@@ -9,6 +9,6 @@ module Plot
     contour!(-h:0.1:h, -v:0.1:v, (x,y)->F[2](variables(F)=>[x,y]), levels=[0], cbar=false, color=:green)
     scatter!([real(sol[1]) for sol in solutions], [real(sol[2]) for sol in solutions], color = "red", label = "Real solutions")
 
-    png(joinpath("plots", "solutions" * name))
+    png(joinpath("./plots", "solutions" * name))
   end
 end
