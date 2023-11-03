@@ -1,7 +1,7 @@
 # External dependencies
 using TypedPolynomials
 using LinearAlgebra
-using Distributed, ClusterManagers
+using Distributed, SlurmClusterManager
 using SharedArrays
 
 # Local dependencies
@@ -18,7 +18,7 @@ using .EulerNewton
 using .AdaptStep
 using .Plot
 
-addprocs(SlurmManager(20), partition="production", t="00:30:00")
+addprocs(SlurmManager())
 
 function compute_root(H, r, maxsteps=1000)
   t = 1.0
