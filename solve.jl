@@ -2,7 +2,7 @@
 using LinearAlgebra
 using TypedPolynomials
 using Distributed, SlurmClusterManager
-addprocs(SlurmClusterManager)
+addprocs(SlurmManager())
 
 # Local deps
 include("random_poly.jl")
