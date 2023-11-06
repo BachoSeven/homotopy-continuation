@@ -1,26 +1,29 @@
-# External dependencies
-using TypedPolynomials
+# External deps
 using LinearAlgebra
+using TypedPolynomials
 using Distributed, SlurmClusterManager
-using SharedArrays
+addprocs(SlurmClusterManager)
 
-# Local dependencies
+# Local deps
 include("random_poly.jl")
-include("start-system.jl")
-include("homotopy.jl")
-include("euler-newton.jl")
-include("adapt-step.jl")
 include("plot.jl")
 using .RandomPoly
-using .StartSystem
-using .Homotopy
-using .EulerNewton
-using .AdaptStep
 using .Plot
+@everywhere begin
+  include("start-system.jl")
+  include("homotopy.jl")
+  include("euler-newton.jl")
+  include("adapt-step.jl")
+end
+# Macros defined in an @everywhere block aren't available inside it
+@everywhere begin
+  using .StartSystem
+  using .Homotopy
+  using .EulerNewton
+  using .AdaptStep
+end
 
-addprocs(SlurmManager())
-
-function compute_root(H, r, maxsteps=1000)
+@everywhere function compute_root(H, r, maxsteps=1000)
   t = 1.0
   step_size = 0.01
   x0 = r
@@ -40,18 +43,23 @@ end
 function solve(F, (G, roots)=start_system(F))
   H = homotopy(F, G)
 
-  sols = SharedArray{ComplexF64,2}(length(roots), length(F))
-  steps = SharedArray{Int64}(length(roots))
-  @sync @distributed for i in eachindex(roots)
-    (solutions, step_array) = compute_root(H, roots[i])
-    sols[i, :] = solutions
+  result = Array{Future}(undef, length(roots))
+  for i in eachindex(roots)
+    result[i] = @spawn compute_root(H, roots[i])
+  end
+
+  sols = Array{ComplexF64,2}(undef, length(roots), length(F))
+  steps = Array{Int64}(undef, length(roots))
+  for i in eachindex(roots)
+    (solution, step_array) = fetch(result[i])
+    sols[i, :] = solution
     steps[i] = step_array
   end
 
   return (sols, steps)
 end
 
-# Input polynomial systems
+# Input polynomial system
 #  @polyvar x y
 #  C = [x^3 - y + 5x^2 - 10, 2x^2 - y - 10]
 #  Q = [x^2 + 2y, y - 3x^3]
@@ -60,30 +68,15 @@ end
 dimension = 2
 R = random_system(2, 2)
 println("System: ", R)
-
-#  (sC, stepsC) = solve(C)
-#  (sQ, stepsQ) = solve(Q)
-#  (sF, stepsF) = solve(F)
-#  (sT, stepsT) = solve(T)
-(sR, stepsR) = solve(R)
+(sol, steps) = solve(R)
+println("Number of steps: ", steps)
 # converting sR to array of arrays instead of a matrix
-sR = [sR[i, :] for i in 1:length(sR[:, 1])]
-
-#  println("C: ", stepsC)
-#  println("Q: ", stepsQ)
-#  println("F: ", stepsF)
-#  println("T: ", stepsT)
-println("R: ", stepsR)
-
-#  sC = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sC)
-#  sQ = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sQ)
-#  sF = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sF)
-#  sT = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sT)
-sR = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sR)
+sol = [sol[i, :] for i in 1:length(sol[:, 1])]
+sol = filter(u -> imag(u[1]) < 0.1 && imag(u[2]) < 0.1, sol)
 
 vars = variables(R)
-println("Solutions: ", sR)
-println("Norms (lower = better): ", [LinearAlgebra.norm([f(vars => s) for f in R]) for s in sR])
+println("Solutions: ", sol)
+println("Norms (lower = better): ", [norm([f(vars => s) for f in R]) for s in sol])
 
 # Plotting the system and the real solutions
 ENV["GKSwstype"] = "nul"
@@ -91,4 +84,4 @@ ENV["GKSwstype"] = "nul"
 #  plot_real(sQ, Q, 2, 2, "2")
 #  plot_real(sF, F, 4, 4, "3")
 #  plot_real(sT, T, 4, 4, "4")
-plot_real(sR, R, 5, 5, "random")
+plot_real(sol, R, 5, 5, "random")
