@@ -67,7 +67,7 @@ end
 #  F = [x*y - 1, x^2 + y^2 - 4]
 #  T = [x*y - 1, x^2 + y^2 - 2]
 
-R = random_system(4, 2)
+R = random_system(3, 5)
 println("System: ", R)
 
 # Parallel execution
