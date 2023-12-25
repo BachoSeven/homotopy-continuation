@@ -10,7 +10,7 @@ This is a project for the "Laboratorio Computazionale" exam at the University of
 
 ## TODO
 
-- [~] Parallelization
+- [x] Parallelization
 - ~~Homogenization~~
 
 ## Example systems

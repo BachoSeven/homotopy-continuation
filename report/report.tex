@@ -9,7 +9,7 @@
 \usepackage{tikz-cd}
 
 % for including julia code
-\usepackage{jlcode}
+\usepackage[linenumbers]{jlcode}
 
 % for vertically aligning images with text
 \usepackage[export]{adjustbox}
@@ -103,31 +103,38 @@
 
 \section{Introduction}
 Homotopy Continuation is a numerical method for solving systems of polynomial equations.
-It is based on the idea of ”deforming” a given system of equations into a simpler one, whose
+It is based on the idea of "deforming" a given system of equations into a simpler one whose
 solutions are known, and then tracking the solutions of the original system as the deformation
 is undone.
 
-In this project, the method will be implemented in the Julia programming language, making use
-of parallel computing in order to speed multiple root finding. The method is described in detail
-in \cite{BertiniBook}, which was the primary source for this report.
+In this project, the method will be implemented in the Julia programming language, which is
+particularly suited for scientific computing.
+The primary source for this report is \cite{BertiniBook},
+where the method is explained in much more detail.
 
 \section{Homotopy Continuation}
 We will only consider \textit{square} systems of polynomial equations, i.e. systems of $n$ polynomial equations in $n$ variables, although or over- or under-determined systems can
-often be solved by reducing them to square systems, by respectively choosing a suitable square subsystem or adding equations. Morever, we will restrict ourselves to systems with
+often be solved by reducing them to square systems, by respectively choosing a suitable square subsystem or squaring it by adding equations. Morever, we will restrict ourselves to
+systems which have
 isolated solutions, i.e. zero-dimensional varieties.
 
 There are many ways to choose the "simpler" system, from now on called a \textit{start system}, but in general we can observe that, by Bezout's theorem, a system
-$F=(f_1,\ldots,f_n)$ has at most $D:=d_1\ldots d_n$ solutions, where $d_i$ is the degre of $f_i(x_1,\ldots,x_n)$. So, we could build a start system of the same size and whose
+$F=(f_1,\ldots,f_n)$ has at most $D:=d_1\ldots d_n$ solutions, where $d_i$ is the degre of $f_i(x_1,\ldots,x_n)$.
+
+Therefore, we can build a start system of the same size and whose
 polynomials have the same degrees, but whose solutions are easy to find, and thus can be used as starting points for the method.
 
 For instance, the system $G=(g_1,\ldots g_n)$, where
 $$ g_i(x_1,\ldots x_n)=x_i^{d_i}-1 ,$$
-is such a system, since it has exactly the $D$ solutions
+is such a system, since its zero locus is obtained by combining the $d_i$-th roots of unity in each variable, which are exactly $D$ points:
 $$ \left\{\left(e^{\frac{k_1}{d_1}2\pi i},\ldots,e^{\frac{k_n}{d_n}2\pi i}\right),\text{ for }0\leq k_i\leq d_i-1\,\text{ and }i=1,\ldots,n\right\} .$$
 \subsection{Choosing the homotopy}
 The deformation between the original system and the start system is a \textit{homotopy}, for instance the convex combination of $F$ and $G$
 \begin{equation}\label{eq:h1} H(x,t)=(1-t)F(x)+tG(x) ,\end{equation}
-where $x:=(x_1,\ldots,x_n)$ and $t\in[0,1].$ This is such that the roots of $H(x,0)=G(x)$ are known, and the roots of $H(x,1)=F(x)$ are the solutions of the original system. Therefore, we can implicitly
+where $x:=(x_1,\ldots,x_n)$ and $t\in[0,1].$ This is such that the roots of $H(x,0)=G(x)$ are known, and the roots of $H(x,1)=F(x)$ are the solutions of the original system (the
+reason why we place the start system at $t=0$ and the original system at $t=1$ is that we need higher numerical precision for the solutions of the original system, and there are more
+floating point numbers near to $t=0$; see \cite{BertiniBook}, p. 33).
+Therefore, we can implicitly
 define a curve $z(t)$ in $\C^n$ by the equation \begin{equation}\label{eq:h2} H(z(t),t)=0,\end{equation} so that in order to approximate the roots of $F$ it is enough to numerically track $z(t)$.
 
 To do so, we derive the expression \eqref{eq:h2} with respect to $t$, and get the \textit{Davidenko Differential Equation}
@@ -143,33 +150,37 @@ $$
 $$
 This can be rewritten as
 \begin{equation}\label{eq:dav} \dot{z}=-\frac{\partial H}{\partial z}^{-1}\frac{\partial H}{\partial t} .\end{equation}
-This is a system of $n$ first-order differential equations, which can be solved numerically for $z(t)$ as an initial value problem, and is called \textit{path tracking}.
+This is a system of $n$ first-order differential equations, which can be solved numerically for $z(t)$ as an initial value problem, which is called \textit{path tracking}.
 \subsubsection{Gamma trick}
 While \eqref{eq:h1} is a fine choice of a homotopy, it's not what it's called a \textit{good homotopy}: in order to ensure that the solution paths $z(t)$ for different roots
 \begin{itemize}
-    \item have no singularities, i.e. never cross each other for $t>0$ (at $t=0$, $F$ could have singular solutions), and
-    \item don't go to infinity for $t\to 0$ ($F$ could have a solution at infinity),
+    \item have no singularities, i.e. never cross each other for $t>0$ (at $t=0$ $F$ could have singular solutions), and
+    \item don't go to infinity for $t\to 0$ (as $F$ could have a solution at infinity),
 \end{itemize}
 we can employ the \textit{Gamma trick}: this consists in modifying the linear homotopy
-\eqref{eq:h1} by susbtituting the parameter $t\in[0,1]$ with a complex curve $q(t)$ connecting $0$ and $1$:
+\eqref{eq:h1} by susbtituting the parameter $t\in[0,1]$ with a complex curve $q(t)$ connecting $0$ and $1$, such as
 $$ q(t)=\frac{\gamma t}{\gamma t+(1-t)} ,$$
-where $\gamma\in(0,1)$ is a random complex parameter.This "probability one" procedure, i.e. for any particular system choosing $\gamma$ outside of a finite amount of lines through
-the origin ensures that we get a good homotopy, basically because of the finiteness of the branch locus of the homotopy.
-After substituting, we get
+where $\gamma\in(0,1)$ is a random complex parameter.
+
+This is a "probability one" procedure, i.e. for any particular system we can choose $\gamma$ outside of a finite amount of rays through
+the origin to ensure that we get a good homotopy, basically because of the finiteness of the branch locus of the homotopy.
+After substituting, we have
 $$ H(x,t)=\frac{(1-t)}{\gamma t+(1-t)}F(x)+\frac{\gamma t}{\gamma t+(1-t)}G(x) ,$$
-and clearing denominators, here's our final homotopy:
+and by clearing denominators, we get our final choice of homotopy:
 \begin{equation}\label{eq:h3} H(x,t)=(1-t)F(x)+\gamma tG(x) .\end{equation}
 \subsection{Tracking down the roots}
-We now want to track down individual roots, following the solution paths from
+We then need to track down individual roots, following the solution paths from
 a root $z_0$ of the start system by solving the initial value problem associated to the Davidenko differential equation \eqref{eq:dav} with starting value $z_0$ and
 $t$ ranging from $1$ to $0$.
 
-This will be done numerically, using a first-order predictor-corrector tracking method, which consists in first using Euler's method to get an approximation
-$\widetilde{z}_i$, and then using Newton's method to correct it
-using equation \eqref{eq:h2} so that it becomes a good approximation $z_i$ of the next value of the solution path.
+This will be done numerically, by using a first-order predictor-corrector tracking method, whose typical iteration goes like this:
+\begin{itemize}
+    \item \textbf{Predictor:} we first apply Euler's method to get an approximation $\widetilde{z}_i$ of the next value of the solution path;
+    \item \textbf{Corrector:} we then use Newton's method to correct $\widetilde{z}_i$ using equation \eqref{eq:h2}, so that it becomes a good approximation $z_i$ of the next value of the solution path.
+\end{itemize}
+In the following sections, we go into more detail on each of these steps.
 \subsubsection{Predictor: Euler's method}
-Recall that Euler's method consists in approximating the solution of the initial value problem associated to a first-order ordinary differential equations
-% Braced system of equations below
+Recall that Euler's method consists in approximating the solution of the initial value problem associated to a system of first-order ordinary differential equations
 \begin{equation*}
     \left\{
         \begin{aligned}
@@ -181,55 +192,47 @@ Recall that Euler's method consists in approximating the solution of the initial
 by the sequence of points $(z_i)_{i\in\N}$ defined by the recurrence relation
 $$ z_{i+1}=z_i+h\cdot f(z_i,t_i) ,$$
 where $h$ is the step size.
-In our case, we have $$f(z,t)=-\left(\frac{\partial H}{\partial z}(z,t)\right)^{-1}\frac{\partial H}{\partial t}(z,t)$$ and $t_0=1$, since we track from $1$ to $0$. For the same
+In the case of the Davidenko equation \eqref{eq:dav}, we have
+$$f(z,t)=-\left(\frac{\partial H}{\partial z}(z,t)\right)^{-1}\frac{\partial H}{\partial t}(z,t)$$ and $t_0=1$, since we are tracking from $1$ to $0$. For the same
 reason, we set $$t_{i+1}=t_i-h.$$
 \subsubsection{Corrector: Newton's method}
-Since we want to solve $$H(z,t)=0,$$ we can use Newton's method to improve the approximation $\widetilde{z_i}$ obtained by Euler's method to a solution of such equation.
+Since we want to solve $$H(z,t)=0,$$ we can use Newton's method to improve the approximation $\widetilde{z_i}$ obtained by Euler's method.
 This is done by moving towards the root of the tangent line of $H$ at the current approximation, or in other words through the iteration
 $$ z_{i+1}=z_i-\left(\frac{\partial H}{\partial z}(z_i,t_{i+1})\right)^{-1}H(z_i,t_{i+1}) ,$$
 where this time $z_0=\widetilde{z}_i$, with $\widetilde{z}_i$ and $t_{i+1}$ obtained from the $i$-th Euler step.
 
-Usually, only a few steps of Newton's method are needed; we will use a fixed number of 5 iterations.
-At this point, we use the final value of the Newton iteration as the starting value for the next Euler step.
+Usually, only a few steps of Newton's method are needed; we chose a fixed number of 5 iterations.
+At which point, we use the final value of the Newton iteration as the starting value for the next Euler step.
 \subsubsection{Adaptive step size}
-In order to improve the efficiency of the method, we will use an adaptive step size, which will be based on the norm of the residual of the Newton iteration.
-If the desired accuracy is not reached, for instance when the norm of $H(z_i,t_i)$ is bigger than $10^{-8}$,
-then we halve the step size; if instead we have 5 "successful" iterations in a row, we double the step size, as implemented in Appendix \hyperref[code:adapt]{A}.
+In order to improve the efficiency of the method, we will use an adaptive step size, which is based on the norm of the residual of Newton's iteration.
+If the desired accuracy is not reached (say, when the norm of $H(z_i,t_i)$ is bigger than $10^{-8}$),
+then we halve the step size; if instead we have 5 "successful" iterations in a row, we double the step size.
 
-\section{Parallelization}
-\subsection{Multithreading}
-When testing the method, we tried to use multithreading to speed up the computation.
-This was done in Julia by using the \texttt{Threads.@threads} macro, which automatically distributes the work of a \texttt{for} loop among the available threads.
-However, in the case of looping over multiple roots, this didn't improve the performance, as the overhead of the multithreading was too big compared to the actual computation time,
-as the systems were too small to benefit from this kind of parallelization, as can be seen by the results in Appendix \hyperref[sec:mt]{B}.
+\section{Testing the method}
+To test the method and its scalability, we first launched it on a single-threaded machine, then one a multi-threaded one, and finally parallelized it on a Cluster, whose specifications can be found in the
+\hyperref[sec:hw]{Hardware} section.
+The latter was done by using the Julia package \textit{Distributed.jl} to parallelize the tracking of the roots on separate nodes, and the \texttt{SlurmClusterManager} package, which allows
+to run Julia code using the \texttt{Slurm} workload manager.
 
-\subsection{Distributed}
-Next, we tried to use \textit{Distributed.jl} to parallelize the tracking of the roots.
-This was done by using the \texttt{MPI.jl} \cite{JuliaMPI} package, which provides a Julia interface to the MPI library.
+In order to scale the method to larger systems, we also implemented a random polynomial generator, which can be found in \hyperref[sec:random]{random-poly.jl}; these were the
+systems used to evaluate the performance of the parallel implementation.
 
-\section{Appendix A: Implementation}
-\subsection{Julia code}
-\jlinputlisting[caption={solve.jl}]{../solve.jl}
-\jlinputlisting[caption={start-system.jl}]{../start-system.jl}
-\jlinputlisting[caption={homotopy.jl}]{../homotopy.jl}
-\jlinputlisting[caption={homogenize.jl}]{../homogenize.jl}
-\jlinputlisting[caption={euler-newton.jl}]{../euler-newton.jl}
-\label{code:adapt}\jlinputlisting[caption={adapt-step.jl}]{../adapt-step.jl}
-\jlinputlisting[caption={plot.jl}]{../plot.jl}
-\subsection{Hardware}
-For the single-threaded runs, the code was run on a laptop with an Intel Core i7-3520M CPU @ 3.60GHz and 6 GB of RAM.
+For sake of visualization, a set of smaller tests was run, in addition to the parallel ones, on a single-threaded machine and a multi-threaded one (using the \texttt{@threads}
+macro from the \textit{Threads.jl} package on the root tracking \texttt{for} loop in the file \hyperref[sec:listing]{solve.jl}); however the multi-threaded runs didn't improve the
+performance on these smaller systems, as the overhead of the multi-threading was too big compared to the actual computation time.
 
-For the multithreaded runs, it was run on a desktop with an AMD FX-8350 CPU @ 4.00GHz with 4 cores and 8 threads, and 12 GB of RAM.
+% TODO: introduce conclusions about parallelization
 
-For the parallel runs, it was run on a cluster with N nodes, each with X CPUs @ Y.ZGHz with M cores and P threads each, and Q GB of RAM.
+The Julia implementation for the tests described above can be found in Appendix \hyperref[sec:listing]{B}.
 
-\section{Appendix B: Results}
+\section{Appendix A: Results}\label{sec:results}
 
-\subsection{Multithreading}\label{sec:mt}
+\subsection{Single- vs Multi-threaded}
 
-Here are the plots for the solutions of four different 2x2 systems, with the single-threaded version next to the multithreaded one:
+Here are the plots for the solutions of four different 2x2 systems for the single-threaded and multi-threaded cases, with the corresponding systems and the real solutions shown in
+red.
 
-\newgeometry{left=.1cm,top=0.1cm}
+\newgeometry{left=.3cm,top=0.1cm}
 \begin{figure}[htb]
     \begin{tabular}{c c c}
         Single-threaded & & Multithreaded \\
@@ -265,6 +268,31 @@ Here are the plots for the solutions of four different 2x2 systems, with the sin
 
 \restoregeometry
 
+\subsection{Parallelization}
+
+Below are the plotted residual norms for the solutions of a randomly generated 3x3 system for the parallelized runs, compared with single-threaded runs for the same systems (the
+latter were run on a single node of the cluster):
+
+The running times for the parallel runs are the following:
+
+\section{Appendix B: Implementation}
+\subsection{Julia code}
+\label{sec:listing}\jlinputlisting[caption={solve.jl}]{../solve.jl}
+\jlinputlisting[caption={start-system.jl}]{../start-system.jl}
+\jlinputlisting[caption={homotopy.jl}]{../homotopy.jl}
+\jlinputlisting[caption={homogenize.jl}]{../homogenize.jl}
+\jlinputlisting[caption={euler-newton.jl}]{../euler-newton.jl}
+\jlinputlisting[caption={adapt-step.jl}]{../adapt-step.jl}
+\label{sec:random}\jlinputlisting[caption={random-poly.jl}]{../random-poly.jl}
+\jlinputlisting[caption={plot.jl}]{../plot.jl}
+\subsection{Hardware}\label{sec:hw}
+For the single-threaded runs, the code was executed on a laptop with an Intel Core i7-3520M CPU @ 3.60GHz and 6 GB of RAM.
+
+The multithreaded runs were tested on a desktop with an AMD FX-8350 CPU @ 4.00GHz with 4 cores and 8 threads, and 12 GB of RAM.
+
+Finally, the parallel computations were run on a cluster with 20 nodes, each having a CPU @ 1.008GHz with 4 Performance cores, 2 efficiency cores and 4 GB of RAM.
+
 \thebibliography{2}
 \bibitem{BertiniBook} Bates, Daniel J. \textit{Numerically solving polynomial systems with Bertini}. SIAM, Society for Industrial Applied Mathematics, 2013.
+\bibitem{Distributed.jl} https://docs.julialang.org/en/v1/stdlib/Distributed
 \end{document}
