@@ -214,8 +214,8 @@ To test the method and its scalability, we first launched it on a single-threade
 The latter was done by using the Julia package \textit{Distributed.jl} to parallelize the tracking of the roots on separate nodes, and the \texttt{SlurmClusterManager} package, which allows
 to run Julia code using the \texttt{Slurm} workload manager.
 
-In order to scale the method to larger systems, we also implemented a random polynomial generator, which can be found in \hyperref[sec:random]{random-poly.jl}; these were the
-systems used to evaluate the performance of the parallel implementation.
+In order to scale the method to larger systems, we also implemented a random polynomial generator, which can be found in \hyperref[sec:random]{random-poly.jl}; this was used to
+create the systems used to evaluate the performance of the parallel implementation.
 
 For sake of visualization, a set of smaller tests was run, in addition to the parallel ones, on a single-threaded machine and a multi-threaded one (using the \texttt{@threads}
 macro from the \textit{Threads.jl} package on the root tracking \texttt{for} loop in the file \hyperref[sec:listing]{solve.jl}); however the multi-threaded runs didn't improve the

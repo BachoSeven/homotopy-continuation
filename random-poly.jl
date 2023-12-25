@@ -12,7 +12,7 @@ module RandomPoly
     monomial_powers=collect(Iterators.product([0:n for _ in 1:m]...))
     monomials = [prod(x.^i) for i in monomial_powers if sum(i) == n]
 
-    return sum(map(m -> rand(Uniform(-10,10)) * m, monomials))
+    return sum(map(m -> rand(Normal()) * m, monomials))
   end
 
   # Generate a system of m random polynomials in m variables
