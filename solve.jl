@@ -3,7 +3,6 @@ using LinearAlgebra
 using TypedPolynomials
 using Distributed, SlurmClusterManager
 addprocs(SlurmManager())
-println("Number of processes: ", nworkers())
 
 # Local deps
 include("random-poly.jl")
