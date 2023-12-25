@@ -66,7 +66,7 @@ end
 #  F = [x*y - 1, x^2 + y^2 - 4]
 #  T = [x*y - 1, x^2 + y^2 - 2]
 
-R = random_system(3, 5)
+R = random_system(5, 3)
 println("System: ", R)
 (G, roots)=start_system(R)
 println("Number of roots: ", length(roots))

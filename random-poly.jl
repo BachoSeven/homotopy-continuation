@@ -19,6 +19,7 @@ module RandomPoly
   # of degree d_i randomly chosen between 1 and max_degree
   function random_system(m, max_degree)
     d = rand(1:max_degree, m)
+    println("Degrees: ", d)
     random_polys = [random_poly(d[i], m) for i in 1:m]
 
     return random_polys
