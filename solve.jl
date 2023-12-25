@@ -6,7 +6,7 @@ addprocs(SlurmManager())
 println("Number of processes: ", nworkers())
 
 # Local deps
-include("random_poly.jl")
+include("random-poly.jl")
 include("plot.jl")
 using .RandomPoly
 using .Plot
