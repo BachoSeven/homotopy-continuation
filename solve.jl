@@ -68,7 +68,7 @@ end
 
 R = random_system(3, 5)
 println("System: ", R)
-(G, roots)=start_system(F)
+(G, roots)=start_system(R)
 println("Number of roots: ", length(roots))
 
 # Parallel execution
