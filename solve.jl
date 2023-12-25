@@ -41,10 +41,9 @@ end
 end
 
 # Main homotopy continuation loop
-function solve(F, (G, roots)=start_system(F))
+function solve(F, G, roots)
   H = homotopy(F, G)
 
-  println("Number of roots: ", length(roots))
   result = Array{Future}(undef, length(roots))
   for i in eachindex(roots)
     result[i] = @spawn compute_root(H, roots[i])
@@ -69,11 +68,13 @@ end
 
 R = random_system(3, 5)
 println("System: ", R)
+(G, roots)=start_system(F)
+println("Number of roots: ", length(roots))
 
 # Parallel execution
-println("Parallel")
+println("PARALLEL")
 @time begin
-  (sol, steps) = solve(R)
+  (sol, steps) = solve(R, G, roots)
 end
 println("Number of steps: ", steps)
 # converting sR to array of arrays instead of a matrix
@@ -84,11 +85,11 @@ vars = variables(R)
 println("Solutions: ", sol)
 println("Norms (lower = better): ", [norm([f(vars => s) for f in R]) for s in sol])
 
-# Single process execution
-println("Single process")
+# Single execution
+println("SINGLE")
 rmprocs(workers())
 @time begin
-  (sol, steps) = solve(R)
+  (sol, steps) = solve(R, G, roots)
 end
 println("Number of steps: ", steps)
 # converting sR to array of arrays instead of a matrix
