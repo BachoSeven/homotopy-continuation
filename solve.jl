@@ -87,7 +87,9 @@ println("Norms (lower = better): ", [norm([f(vars => s) for f in R]) for s in so
 
 # Single execution
 println("SINGLE")
-rmprocs(workers())
+for i in workers()
+  rmprocs(i)
+end
 @time begin
   (sol, steps) = solve(R, G, roots)
 end
