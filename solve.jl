@@ -99,6 +99,8 @@ vars = variables(R)
 println("Solutions: ", sol)
 println("Norms (lower = better): ", [norm([f(vars => s) for f in R]) for s in sol])
 
+finalize(SlurmManager())
+
 # Plotting the system and the real solutions
 # ENV["GKSwstype"] = "nul"
 # plot_real(sC, C, 6, 12, "1")
