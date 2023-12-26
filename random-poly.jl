@@ -10,7 +10,7 @@ module RandomPoly
     x = [TypedPolynomials.Variable{Symbol("x[$i]")}() for i in 1:m]
 
     monomial_powers=collect(Iterators.product([0:n for _ in 1:m]...))
-    monomials = [prod(x.^i) for i in monomial_powers if sum(i) == n]
+    monomials = [prod(x.^i) for i in monomial_powers if sum(i) <= n && sum(i) != 0]
 
     return sum(map(m -> rand(Normal()) * m, monomials))
   end

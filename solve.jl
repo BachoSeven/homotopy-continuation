@@ -46,7 +46,7 @@ function solve(F, G, roots)
 
   result = Array{Future}(undef, length(roots))
   for i in eachindex(roots)
-    result[i] = @spawn compute_root(H, roots[i])
+    result[i] = @spawnat :any compute_root(H, roots[i])
   end
 
   sols = Array{ComplexF64,2}(undef, length(roots), length(F))
