@@ -66,7 +66,7 @@ end
 #  F = [x*y - 1, x^2 + y^2 - 4]
 #  T = [x*y - 1, x^2 + y^2 - 2]
 
-R = random_system(5, 3)
+R = random_system(5, 5)
 println("System: ", R)
 (G, roots)=start_system(R)
 println("Number of roots: ", length(roots))
@@ -87,9 +87,7 @@ println("Norms (lower = better): ", [norm([f(vars => s) for f in R]) for s in so
 
 # Single execution
 println("SINGLE")
-for i in workers()
-  rmprocs(i)
-end
+wait(rmprocs(workers()))
 @time begin
   (sol, steps) = solve(R, G, roots)
 end
