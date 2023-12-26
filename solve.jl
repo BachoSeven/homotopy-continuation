@@ -2,7 +2,8 @@
 using LinearAlgebra
 using TypedPolynomials
 using Distributed, SlurmClusterManager
-addprocs(SlurmManager())
+slurm_manager = SlurmManager()
+addprocs(slurm_manager)
 
 # Local deps
 include("random-poly.jl")
@@ -99,7 +100,8 @@ vars = variables(R)
 println("Solutions: ", sol)
 println("Norms (lower = better): ", [norm([f(vars => s) for f in R]) for s in sol])
 
-finalize(SlurmManager())
+# See https://github.com/kleinhenz/SlurmClusterManager.jl/issues/11
+finalize(slurm_manager)
 
 # Plotting the system and the real solutions
 # ENV["GKSwstype"] = "nul"
