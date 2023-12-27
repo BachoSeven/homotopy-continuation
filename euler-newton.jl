@@ -8,11 +8,12 @@ module EulerNewton
   function en_step(H, x, t, step_size)
 
     # Predictor step
-    vars = variables(H(t))
+    vars = variables(H(1))
     # Jacobian of H evaluated at (x,t)
     JH = [jh(vars=>x) for jh in differentiate(H(t), vars)]
-    # ∂H/∂t is the same as γG-F=H(1)-H(0) for our choice of homotopy
-    Δx = JH \ -[gg(vars=>x) for gg in H(1)-H(0)]
+    # ∂H/∂t = γG-F = H(1)-H(0) for our homotopy; it doesn't depend on t
+    δH_δt = [dh(vars=>x) for dh in H(1)-H(0)]
+    Δx = JH \ -δH_δt
     xh = x + Δx * step_size
 
     # Corrector step
