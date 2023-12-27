@@ -24,9 +24,9 @@ end
   using .AdaptStep
 end
 
-@everywhere function compute_root(H, r, maxsteps=1000)
+@everywhere function compute_root(H, r, maxsteps=200)
   t = 1.0
-  step_size = 0.01
+  step_size = 0.001
   x0 = r
   m = 0
   steps = 0
