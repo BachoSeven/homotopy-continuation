@@ -8,6 +8,8 @@
 \usepackage{geometry}
 \usepackage{tikz-cd}
 
+\usepackage{pgfplots}
+
 % for including julia code
 \usepackage[linenumbers]{jlcode}
 
@@ -209,29 +211,46 @@ If the desired accuracy is not reached (say, when the norm of $H(z_i,t_i)$ is bi
 then we halve the step size; if instead we have 5 "successful" iterations in a row, we double the step size.
 
 \section{Testing the method}
-To test the method and its scalability, we first launched it on a single-threaded machine, then one a multi-threaded one, and finally parallelized it on a Cluster, whose specifications can be found in the
-\hyperref[sec:hw]{Hardware} section.
+To test the method's scalability, we first launched it on a single-threaded machine, then one a multi-threaded one, and finally parallelized it on a Cluster.
+
 The latter was done by using the Julia package \textit{Distributed.jl} to parallelize the tracking of the roots on separate nodes, and the \texttt{SlurmClusterManager} package, which allows
 to run Julia code using the \texttt{Slurm} workload manager.
 
-In order to scale the method to larger systems, we also implemented a random polynomial generator, which can be found in \hyperref[sec:random]{random-poly.jl}; this was used to
-create the systems used to evaluate the performance of the parallel implementation.
+In order to scale the method to larger systems, we also implemented a random polynomial generator which can be found in \hyperref[sec:random]{random-poly.jl}; this was used to
+evaluate the performance of the parallel implementation, by generating square systems of polynomials with normally distributed coefficients, each
+polynomial having total degree less or equal to a fixed maximum degree.
 
-For sake of visualization, a set of smaller tests was run, in addition to the parallel ones, on a single-threaded machine and a multi-threaded one (using the \texttt{@threads}
-macro from the \textit{Threads.jl} package on the root tracking \texttt{for} loop in the file \hyperref[sec:listing]{solve.jl}); however the multi-threaded runs didn't improve the
-performance on these smaller systems, as the overhead of the multi-threading was too big compared to the actual computation time.
+The single-threaded machine and multi-threaded tests (which used the \texttt{@threads}
+macro from the \textit{Threads.jl} package on the root tracking \texttt{for} loop in the file \hyperref[sec:listing]{solve.jl}) were run in order to visualize the real solutions of
+small (2x2) systems: here, multi-threaded runs didn't improve the
+performance on these smaller systems, as the overhead of multi-threading was too big compared to the actual computation time.
 
-\ldots
-perhaps because of our choice of predictor-corrector which could be unsuitable for larger systems.
+However, when testing a parallel implementation on larger randomly generated systems we observed an improvement in execution times on larger systems compared to the single-node
+runs, as we show in the \hyperref[sec:parallel]{Results} section.
 
-The Julia implementation for the tests described above can be found in Appendix \hyperref[sec:listing]{B}.
+The Julia implementation for the tests described above can be found in Appendix \hyperref[sec:listing]{B}, while
+the hardware specifications are listed in Appendix \hyperref[sec:hw]{A}.
 
-\section{Appendix A: Results}\label{sec:results}
+\section{Possible Improvements}
 
-\subsection{Single- vs Multi-threaded}
+\subsection{Homogenized Coordinates}
 
-Here are the plots for the solutions of four different 2x2 systems for the single-threaded and multi-threaded cases, with the corresponding systems and the real solutions shown in
-red.
+Since our start systems have the maximum number of solutions for its degree, some of them might converge to a point at infinity of our original system. In our current
+implementation, we waste time by tracking them until reaching the maximum number of iterations.
+
+To better treat such cases, we could view the system inside an affine patch of the projective plane, and using homogenized coordinates detect when a solution is going to infinity. This would involve homogenizing both systems and modifying the path-tracking algorithm for the detection of a point going to infinity.
+
+\subsection{Predictor-Corrector}
+
+Our (un)specific choice of predictor could be unsuitable for badly-conditioned systems; other software implementations of the homotopy continuation method use more accurate and numerically stable predictors, such as Runge-Kutta methods
+\cite{HomotopyContinuation.jl}.
+
+\section{Appendix A: Results}
+
+\subsection{Single- and Multi-threaded}
+
+Below are the plots of four different 2x2 systems for the single- (laptop) and multi- (desktop) threaded runs, with the real solutions being shown in
+\textcolor{red}{red}:
 
 \newgeometry{left=.3cm,top=0.1cm}
 \begin{figure}[htb]
@@ -269,12 +288,51 @@ red.
 
 \restoregeometry
 
-\subsection{Parallelization}
+\subsection{Parallelization}\label{sec:parallel}
 
-Below are the plotted residual norms for the solutions of a randomly generated 3x3 system for the parallelized runs, compared with single-threaded runs for the same systems (the
-latter were run on a single node of the cluster):
+The following figure compares the execution times of the \texttt{solve} function in \hyperref[sec:listing]{solve.jl} on the cluster,
+on a single node and on 20 nodes (using 1 or 2 threads per node).
 
-The running times for the parallel runs are the following:
+
+\begin{figure}[htb]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={\# of tracked roots},
+            ylabel={Running Times (s)},
+            legend pos=north west,
+            grid=major,
+        ]
+
+        \addplot[mark=*,blue] coordinates {
+            (18, 139.703750)
+            (24, 171.741583)
+            (54, 290.947457)
+            (90, 252.224948)
+            (108, 266.180392)
+            (120, 231.164993)
+            (144, 280.459045)
+        };
+        \addlegendentry{Parallel}
+
+        \addplot[mark=square,red] coordinates {
+            (18, 95.067010)
+            (24, 109.203866)
+            (54, 251.746024)
+            (90, 774.436612)
+            (108, 1098.606851)
+            (120, 805.911525)
+            (144, 1908.437483)
+        };
+        \addlegendentry{Single Node}
+
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Performance comparison of parallel path tracking on a cluster.}
+\end{figure}
+
+As we can see from the plot, the parallel implementation appears to scale well with the number of tracked roots, and is faster than the single-node implementation for larger
+systems.
 
 \section{Appendix B: Implementation}
 \subsection{Julia code}
@@ -296,4 +354,5 @@ Finally, the parallel computations were run on a cluster with 20 nodes, each hav
 \thebibliography{2}
 \bibitem{BertiniBook} Bates, Daniel J. \textit{Numerically solving polynomial systems with Bertini}. SIAM, Society for Industrial Applied Mathematics, 2013.
 \bibitem{Distributed.jl} https://docs.julialang.org/en/v1/stdlib/Distributed
+\bibitem{HomotopyContinuation.jl} Breiding, P., Timme, S. (2018). HomotopyContinuation.jl: A Package for Homotopy Continuation in Julia. In: Davenport, J., Kauers, M., Labahn, G., Urban, J. (eds) Mathematical Software – ICMS 2018. Lecture Notes in Computer Science, vol 10931. Springer, Cham.
 \end{document}
