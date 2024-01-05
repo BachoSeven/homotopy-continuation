@@ -63,8 +63,8 @@
         \begin{large}
             \begin{center}
                 \vbox to 100pt{%
-                    \includegraphics[width=3cm]{cherubino}%
-                \vfil}
+                        \includegraphics[width=3cm]{cherubino}%
+                        \vfil}
             \end{center}
             \begin{center}
                 \begin{Large}
@@ -86,7 +86,7 @@
                 \end{Huge}
                 \bigskip\vfill
                 \begin{tabular}{ll}
-                    \textbf{Studente:} & Francesco Minnocci\\
+                    \textbf{Studente:}  & Francesco Minnocci \\
                     \textbf{Matricola:} & 600455
                 \end{tabular}
             \end{center}
@@ -143,12 +143,12 @@ To do so, we derive the expression \eqref{eq:h2} with respect to $t$, and get th
 $$ \frac{\partial H}{\partial z}\frac{\mathrm{d} z}{\mathrm{d} t}+\frac{\partial H}{\partial t}=0 ,$$
 where $\frac{\partial H}{\partial z}$ is the Jacobian matrix of $H$ with respect to $z$:
 $$
-\frac{\partial H}{\partial z}=
-\begin{pmatrix}
-    \frac{\partial H_1}{\partial z_1} & \cdots & \frac{\partial H_1}{\partial z_n}\\
-    \vdots & \ddots & \vdots\\
-    \frac{\partial H_n}{\partial z_1} & \cdots & \frac{\partial H_n}{\partial z_n}
-\end{pmatrix} .
+    \frac{\partial H}{\partial z}=
+    \begin{pmatrix}
+        \frac{\partial H_1}{\partial z_1} & \cdots & \frac{\partial H_1}{\partial z_n} \\
+        \vdots                            & \ddots & \vdots                            \\
+        \frac{\partial H_n}{\partial z_1} & \cdots & \frac{\partial H_n}{\partial z_n}
+    \end{pmatrix} .
 $$
 This can be rewritten as
 \begin{equation}\label{eq:dav} \dot{z}=-\frac{\partial H}{\partial z}^{-1}\frac{\partial H}{\partial t} .\end{equation}
@@ -185,10 +185,10 @@ In the following sections, we go into more detail on each of these steps.
 Recall that Euler's method consists in approximating the solution of the initial value problem associated to a system of first-order ordinary differential equations
 \begin{equation*}
     \left\{
-        \begin{aligned}
-            &\dot{z}=f(z,t)\\
-            &z(t_0)=z_0
-        \end{aligned}
+    \begin{aligned}
+         & \dot{z}=f(z,t) \\
+         & z(t_0)=z_0
+    \end{aligned}
     \right.
 \end{equation*}
 by the sequence of points $(z_i)_{i\in\N}$ defined by the recurrence relation
@@ -255,34 +255,34 @@ Below are the plots of four different 2x2 systems for the single- (laptop) and m
 \newgeometry{left=.3cm,top=0.1cm}
 \begin{figure}[htb]
     \begin{tabular}{c c c}
-        Single-threaded & & Multithreaded \\
+        Single-threaded                                                          &   & Multithreaded \\
         \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions1.png} &
         $\left\{\begin{aligned}
-                    &x^3 + 5x^2 - y - 1 \\
-                    &2x^2 - y - 1 \\
-        \end{aligned}\right.$ &
-        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions1_6.png} \\
-        \vspace{0.5cm} \\
+                         & x^3 + 5x^2 - y - 1 \\
+                         & 2x^2 - y - 1       \\
+                    \end{aligned}\right.$                                                 &
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions1_6.png}                   \\
+        \vspace{0.5cm}                                                                               \\
         \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions2.png} &
         $\left\{\begin{aligned}
-                    &x^2 + 2y  \\
-                    &y - 3x^3 \\
-        \end{aligned}\right.$ &
-        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions2_6.png} \\
-        \vspace{0.5cm} \\
+                         & x^2 + 2y \\
+                         & y - 3x^3 \\
+                    \end{aligned}\right.$                                                  &
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions2_6.png}                   \\
+        \vspace{0.5cm}                                                                               \\
         \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions3.png} &
         $\left\{\begin{aligned}
-                    &x^2 + y^2 - 4 \\
-                    &xy - 1 \\
-        \end{aligned}\right.$ &
-        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions3_6.png} \\
-        \vspace{0.5cm} \\
+                         & x^2 + y^2 - 4 \\
+                         & xy - 1        \\
+                    \end{aligned}\right.$                                                  &
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions3_6.png}                   \\
+        \vspace{0.5cm}                                                                               \\
         \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions4.png} &
         $\left\{\begin{aligned}
-                    &x^2 + y^2 - 2 \\
-                    &xy - 1 \\
-        \end{aligned}\right.$ &
-        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions4_6.png} \\
+                         & x^2 + y^2 - 2 \\
+                         & xy - 1        \\
+                    \end{aligned}\right.$                                                  &
+        \includegraphics[width=0.45\textwidth,valign=c]{../plots/solutions4_6.png}                   \\
     \end{tabular}
 \end{figure}
 
@@ -298,33 +298,33 @@ on a single node and on 20 nodes (using 1 or 2 threads per node).
     \centering
     \begin{tikzpicture}
         \begin{axis}[
-            xlabel={\# of tracked roots},
-            ylabel={Running Times (s)},
-            legend pos=north west,
-            grid=major,
-        ]
+                xlabel={\# of tracked roots},
+                ylabel={Running Times (s)},
+                legend pos=north west,
+                grid=major,
+            ]
 
-        \addplot[mark=*,blue] coordinates {
-            (18, 139.703750)
-            (24, 171.741583)
-            (54, 290.947457)
-            (90, 252.224948)
-            (108, 266.180392)
-            (120, 231.164993)
-            (144, 280.459045)
-        };
-        \addlegendentry{Parallel}
+            \addplot[mark=*,blue] coordinates {
+                    (18, 139.703750)
+                    (24, 171.741583)
+                    (54, 290.947457)
+                    (90, 252.224948)
+                    (108, 266.180392)
+                    (120, 231.164993)
+                    (144, 280.459045)
+                };
+            \addlegendentry{Parallel}
 
-        \addplot[mark=square,red] coordinates {
-            (18, 95.067010)
-            (24, 109.203866)
-            (54, 251.746024)
-            (90, 774.436612)
-            (108, 1098.606851)
-            (120, 805.911525)
-            (144, 1908.437483)
-        };
-        \addlegendentry{Single Node}
+            \addplot[mark=square,red] coordinates {
+                    (18, 95.067010)
+                    (24, 109.203866)
+                    (54, 251.746024)
+                    (90, 774.436612)
+                    (108, 1098.606851)
+                    (120, 805.911525)
+                    (144, 1908.437483)
+                };
+            \addlegendentry{Single Node}
 
         \end{axis}
     \end{tikzpicture}
@@ -336,6 +336,13 @@ systems.
 
 \section{Appendix B: Implementation}
 \subsection{Julia code}
+
+The code is also available at the following GitHub repository:
+
+\begin{center}
+    \fbox{\url{https://github.com/bachoseven/homotopy-continuation}}
+\end{center}
+
 \label{sec:listing}\jlinputlisting[caption={solve.jl}]{../solve.jl}
 \jlinputlisting[caption={start-system.jl}]{../start-system.jl}
 \jlinputlisting[caption={homotopy.jl}]{../homotopy.jl}
